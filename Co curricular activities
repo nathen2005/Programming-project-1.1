@@ -1,0 +1,223 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+// Constants
+const int MAX_STUDENTS_PER_GROUP = 50;
+const int MAX_SPORT_CAPACITY = 20;
+const int MAX_CLUB_CAPACITY = 60;
+const double MAX_CLUB_GENDER_PERCENTAGE = 0.5;
+const double MAX_SPORT_GENDER_PERCENTAGE = 0.75;
+
+// Structures
+struct Student {
+    string firstname;
+    string surname;
+    char gender; // 'M' or 'F'
+    int age;
+    int bbitGroup;
+    string sport; // Empty if not participating in any sport
+    vector<string> clubs; // Maximum 3 clubs
+};
+
+class CoCurricularManager {
+private:
+    vector<Student> students;
+    vector<string> sports = {"rugby", "athletics", "swimming", "soccer"};
+    vector<string> clubs = {"Journalism Club", "Red Cross Society", "AISEC", "Business Club", "Computer Science Club"};
+
+public:
+    void run() {
+        int choice;
+        do {
+            displayMenu();
+            cout << "Enter your choice: ";
+            cin >> choice;
+            cin.ignore(); // Clear newline from input buffer
+
+            switch (choice) {
+                case 1:
+                    addStudent();
+                    break;
+                case 2:
+                    viewStudents();
+                    break;
+                case 3:
+                    viewClubs();
+                    break;
+                case 4:
+                    viewSports();
+                    break;
+                case 5:
+                    viewGroupedStudents();
+                    break;
+                case 6:
+                    saveToFile();
+                    break;
+                case 7:
+                    cout << "Exiting the program...\n";
+                    break;
+                default:
+                    cout << "Invalid choice. Please enter a valid option.\n";
+            }
+        } while (choice != 7);
+    }
+
+private:
+    void displayMenu() {
+        cout << "\n===== Co-curricular Activities Management System =====\n";
+        cout << "1. Add Student\n";
+        cout << "2. View Students\n";
+        cout << "3. View Clubs/ Societies\n";
+        cout << "4. View Sports\n";
+        cout << "5. View Grouped Students\n";
+        cout << "6. Save all Files\n";
+        cout << "7. Exit\n";
+    }
+
+    void addStudent() {
+        Student newStudent;
+        cout << "Enter student's first name: ";
+        getline(cin, newStudent.firstname);
+        cout << "Enter student's surname: ";
+        getline(cin, newStudent.surname);
+        cout << "Enter student's gender (M/F): ";
+        cin >> newStudent.gender;
+        cout << "Enter student's age: ";
+        cin >> newStudent.age;
+        cout << "Enter student's BBIT group (1-3): ";
+        cin >> newStudent.bbitGroup;
+        cin.ignore(); // Clear newline from input buffer
+
+        // Check if student can participate in a sport
+        if (canParticipateInSport()) {
+            cout << "Available sports:\n";
+            viewSports();
+            cout << "Enter sport choice: ";
+            getline(cin, newStudent.sport);
+        }
+
+        // Check if student can participate in clubs
+        if (canParticipateInClubs()) {
+            cout << "Available clubs/societies:\n";
+            viewClubs();
+            int numClubs;
+            do {
+                cout << "Enter number of clubs (max 3): ";
+                cin >> numClubs;
+            } while (numClubs < 0 || numClubs > 3);
+
+            cin.ignore(); // Clear newline from input buffer
+            for (int i = 0; i < numClubs; ++i) {
+                string club;
+                cout << "Enter club/society " << i + 1 << ": ";
+                getline(cin, club);
+                newStudent.clubs.push_back(club);
+            }
+        }
+
+        students.push_back(newStudent);
+        cout << "Student added successfully.\n";
+    }
+
+    bool canParticipateInSport() {
+        int numSports = count_if(students.begin(), students.end(),
+            [](const Student &s) { return !s.sport.empty(); });
+        return numSports < sports.size() * MAX_SPORT_CAPACITY;
+    }
+
+    bool canParticipateInClubs() {
+        int numClubs = count_if(students.begin(), students.end(),
+            [](const Student &s) { return s.clubs.size() > 0; });
+        return numClubs < clubs.size() * MAX_CLUB_CAPACITY;
+    }
+
+    void viewStudents() {
+        cout << "\n===== List of Students =====\n";
+        srand(static_cast<unsigned int>(time(nullptr))); // Seed random number generator
+        for (const auto &sport : sports) {
+            cout << "Sport: " << sport << "\n";
+            for (int i = 0; i < 5; ++i) {
+                string firstname = generateRandomName("M");
+                string surname = generateRandomName("F");
+                cout << "  " << firstname << " " << surname << "\n";
+            }
+            cout << "\n";
+        }
+
+        for (const auto &club : clubs) {
+            cout << "Club: " << club << "\n";
+            for (int i = 0; i < 5; ++i) {
+                string firstname = generateRandomName("M");
+                string surname = generateRandomName("F");
+                cout << "  " << firstname << " " << surname << "\n";
+            }
+            cout << "\n";
+        }
+    }
+
+    string generateRandomName(const string& gender) {
+        vector<string> maleNames = {"John", "Michael", "James", "David", "Daniel"};
+        vector<string> femaleNames = {"Mary", "Jennifer", "Linda", "Emily", "Hannah"};
+
+        if (gender == "M") {
+            return maleNames[rand() % maleNames.size()];
+        } else {
+            return femaleNames[rand() % femaleNames.size()];
+        }
+    }
+
+    void viewClubs() {
+        cout << "\n===== List of Clubs/ Societies =====\n";
+        for (const auto &club : clubs) {
+            cout << club << " (Capacity: " << MAX_CLUB_CAPACITY << ")\n";
+        }
+    }
+
+    void viewSports() {
+        cout << "\n===== List of Sports =====\n";
+        for (const auto &sport : sports) {
+            cout << sport << " (Capacity: " << MAX_SPORT_CAPACITY << ")\n";
+        }
+    }
+
+    void viewGroupedStudents() {
+        // To be implemented based on the requirement
+        cout << "View Grouped Students\n";
+    }
+
+    void saveToFile() {
+        ofstream outFile("students.csv");
+        if (outFile.is_open()) {
+            outFile << "Firstname,Surname,Gender,Age,BBIT Group,Sport,Clubs\n";
+            for (const auto &student : students) {
+                outFile << student.firstname << ","
+                        << student.surname << ","
+                        << student.gender << ","
+                        << student.age << ","
+                        << student.bbitGroup << ","
+                        << student.sport << ",";
+                for (const auto &club : student.clubs) {
+                    outFile << club << ";";
+                }
+                outFile << "\n";
+            }
+            outFile.close();
+            cout << "Data saved to students.csv\n";
+        } else {
+            cout << "Unable to open file for saving.\n";
+        }
+    }
+};
+
+int main() {
+    CoCurricularManager manager;
+    manager.run();
+
+    return 0;
