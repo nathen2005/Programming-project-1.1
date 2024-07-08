@@ -1,6 +1,8 @@
 # Programming-project-1.1
 
 This C++ program is a Co-curricular Activities Management System designed to manage students, their participation in sports, and clubs/societies. Let's break down the code and its functionality:
+This code was developed by the following group members: Imran Hamid 191730
+                                                        
 
 For the first parts that have include, These are standard C++ library includes for input/output, file handling, data structures (vector), string manipulation, algorithms (count_if), and random number generation.
 
