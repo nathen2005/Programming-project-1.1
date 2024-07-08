@@ -1,4 +1,11 @@
 # Programming-project-1.1
+Group Members:
+Imran Hamid - 191730
+Samuel Omambia - 101861
+Nathen Simbili - 191726
+Yusuf Mahamud - 147613
+Hamza Abdi - 191297
+
 
 This C++ program is a Co-curricular Activities Management System designed to manage students, their participation in sports, and clubs/societies. Let's break down the code and its functionality:
 
